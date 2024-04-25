@@ -96,8 +96,8 @@ class FK:
         #print (translations)
         batch=translations.shape[0]
         joint_num=translations.shape[1]
-        zeros = torch.autograd.Variable(torch.zeros(batch,joint_num,1)#.cuda())
-        ones = torch.autograd.Variable(torch.ones(batch,joint_num,1)#.cuda())
+        zeros = torch.autograd.Variable(torch.zeros(batch,joint_num,1).cuda())
+        ones = torch.autograd.Variable(torch.ones(batch,joint_num,1).cuda())
         
         dim0 = torch.cat( (ones, zeros, zeros, translations[:,:,0].view(batch, joint_num,1))  , 2)
         dim1 = torch.cat( (zeros, ones, zeros, translations[:,:,1].view(batch, joint_num,1))  , 2)

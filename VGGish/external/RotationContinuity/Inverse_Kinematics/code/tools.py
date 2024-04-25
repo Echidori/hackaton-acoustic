@@ -9,12 +9,12 @@ import numpy as np
 def normalize_5d_rotation( r5d):
     batch = r5d.shape[0]
     sin_cos = r5d[:,0:2] #batch*2
-    sin_cos_mag = torch.max(torch.sqrt( sin_cos.pow(2).sum(1)), torch.autograd.Variable(torch.DoubleTensor([1e-8])#.cuda()) ) #batch
+    sin_cos_mag = torch.max(torch.sqrt( sin_cos.pow(2).sum(1)), torch.autograd.Variable(torch.DoubleTensor([1e-8]).cuda()) ) #batch
     sin_cos_mag=sin_cos_mag.view(batch,1).expand(batch,2) #batch*2
     sin_cos = sin_cos/sin_cos_mag #batch*2
         
     axis = r5d[:,2:5] #batch*3
-    axis_mag = torch.max(torch.sqrt( axis.pow(2).sum(1)), torch.autograd.Variable(torch.DoubleTensor([1e-8])#.cuda()) ) #batch
+    axis_mag = torch.max(torch.sqrt( axis.pow(2).sum(1)), torch.autograd.Variable(torch.DoubleTensor([1e-8]).cuda()) ) #batch
         
     axis_mag=axis_mag.view(batch,1).expand(batch,3) #batch*3
     axis = axis/axis_mag #batch*3
@@ -58,7 +58,7 @@ def compute_pose_from_rotation_matrix(T_pose, r_matrix):
 def normalize_vector( v):
     batch=v.shape[0]
     v_mag = torch.sqrt(v.pow(2).sum(1))# batch
-    v_mag = torch.max(v_mag, torch.autograd.Variable(torch.FloatTensor([1e-8])#.cuda()))
+    v_mag = torch.max(v_mag, torch.autograd.Variable(torch.FloatTensor([1e-8]).cuda()))
     v_mag = v_mag.view(batch,1).expand(batch,v.shape[1])
     v = v/v_mag
     return v
@@ -114,7 +114,7 @@ def stereographic_unproject(a, axis=None):
     if axis is None:
         axis = a.shape[1]
     s2 = torch.pow(a,2).sum(1) #batch
-    ans = torch.autograd.Variable(torch.zeros(batch, a.shape[1]+1)#.cuda()) #batch*6
+    ans = torch.autograd.Variable(torch.zeros(batch, a.shape[1]+1).cuda()) #batch*6
     unproj = 2*a/(s2+1).view(batch,1).repeat(1,a.shape[1]) #batch*5
     if(axis>0):
         ans[:,:axis] = unproj[:,:axis] #batch*(axis-0)
@@ -129,7 +129,7 @@ def stereographic_unproject(a, axis=None):
 def compute_rotation_matrix_from_ortho5d(a):
     batch = a.shape[0]
     proj_scale_np = np.array([np.sqrt(2)+1, np.sqrt(2)+1, np.sqrt(2)]) #3
-    proj_scale = torch.autograd.Variable(torch.FloatTensor(proj_scale_np)#.cuda()).view(1,3).repeat(batch,1) #batch,3
+    proj_scale = torch.autograd.Variable(torch.FloatTensor(proj_scale_np).cuda()).view(1,3).repeat(batch,1) #batch,3
     
     u = stereographic_unproject(a[:, 2:5] * proj_scale, axis=0)#batch*4
     norm = torch.sqrt(torch.pow(u[:,1:],2).sum(1)) #batch
@@ -260,7 +260,7 @@ def proj_u_a(u,a):
     batch=u.shape[0]
     top = u[:,0]*a[:,0] + u[:,1]*a[:,1]+u[:,2]*a[:,2]
     bottom = u[:,0]*u[:,0] + u[:,1]*u[:,1]+u[:,2]*u[:,2]
-    bottom = torch.max(torch.autograd.Variable(torch.zeros(batch)#.cuda())+1e-8, bottom)
+    bottom = torch.max(torch.autograd.Variable(torch.zeros(batch).cuda())+1e-8, bottom)
     factor = (top/bottom).view(batch,1).expand(batch,3)
     out = factor* u
     return out
@@ -290,11 +290,11 @@ def compute_rotation_matrix_from_matrix(matrices):
 def get_44_rotation_matrix_from_33_rotation_matrix(m):
     batch = m.shape[0]
     
-    row4 = torch.autograd.Variable(torch.zeros(batch, 1,3)#.cuda())
+    row4 = torch.autograd.Variable(torch.zeros(batch, 1,3).cuda())
     
     m43 = torch.cat((m, row4),1)#batch*4,3
     
-    col4 = torch.autograd.Variable(torch.zeros(batch,4,1)#.cuda())
+    col4 = torch.autograd.Variable(torch.zeros(batch,4,1).cuda())
     col4[:,3,0]=col4[:,3,0]+1
     
     out=torch.cat((m43, col4), 2) #batch*4*4
@@ -311,8 +311,8 @@ def compute_geodesic_distance_from_two_matrices(m1, m2):
     m = torch.bmm(m1, m2.transpose(1,2)) #batch*3*3
     
     cos = (  m[:,0,0] + m[:,1,1] + m[:,2,2] - 1 )/2
-    cos = torch.min(cos, torch.autograd.Variable(torch.ones(batch)#.cuda()) )
-    cos = torch.max(cos, torch.autograd.Variable(torch.ones(batch)#.cuda())*-1 )
+    cos = torch.min(cos, torch.autograd.Variable(torch.ones(batch).cuda()) )
+    cos = torch.max(cos, torch.autograd.Variable(torch.ones(batch).cuda())*-1 )
     
     
     theta = torch.acos(cos)
@@ -331,24 +331,24 @@ def compute_angle_from_r_matrices(m):
     batch=m.shape[0]
     
     cos = (  m[:,0,0] + m[:,1,1] + m[:,2,2] - 1 )/2
-    cos = torch.min(cos, torch.autograd.Variable(torch.ones(batch)#.cuda()) )
-    cos = torch.max(cos, torch.autograd.Variable(torch.ones(batch)#.cuda())*-1 )
+    cos = torch.min(cos, torch.autograd.Variable(torch.ones(batch).cuda()) )
+    cos = torch.max(cos, torch.autograd.Variable(torch.ones(batch).cuda())*-1 )
     
     theta = torch.acos(cos)
     
     return theta
     
 def get_sampled_rotation_matrices_by_quat(batch):
-    #quat = torch.autograd.Variable(torch.rand(batch,4)#.cuda())
-    quat = torch.autograd.Variable(torch.randn(batch, 4)#.cuda())
+    #quat = torch.autograd.Variable(torch.rand(batch,4).cuda())
+    quat = torch.autograd.Variable(torch.randn(batch, 4).cuda())
     matrix = compute_rotation_matrix_from_quaternion(quat)
     return matrix
     
 def get_sampled_rotation_matrices_by_hpof(batch):
     
-    theta = torch.autograd.Variable(torch.FloatTensor(np.random.uniform(0,1, batch)*np.pi)#.cuda()) #[0, pi]
-    phi   =  torch.autograd.Variable(torch.FloatTensor(np.random.uniform(0,2,batch)*np.pi)#.cuda())      #[0,2pi)
-    tao   = torch.autograd.Variable(torch.FloatTensor(np.random.uniform(0,2,batch)*np.pi)#.cuda())      #[0,2pi)
+    theta = torch.autograd.Variable(torch.FloatTensor(np.random.uniform(0,1, batch)*np.pi).cuda()) #[0, pi]
+    phi   =  torch.autograd.Variable(torch.FloatTensor(np.random.uniform(0,2,batch)*np.pi).cuda())      #[0,2pi)
+    tao   = torch.autograd.Variable(torch.FloatTensor(np.random.uniform(0,2,batch)*np.pi).cuda())      #[0,2pi)
     
     
     qw = torch.cos(theta/2)*torch.cos(tao/2)
@@ -378,9 +378,9 @@ def get_sampled_rotation_matrices_by_hpof(batch):
 #axisAngle batch*4 angle, x,y,z
 def get_sampled_rotation_matrices_by_axisAngle( batch):
     
-    theta = torch.autograd.Variable(torch.FloatTensor(np.random.uniform(-1,1, batch)*np.pi)#.cuda()) #[0, pi] #[-180, 180]
+    theta = torch.autograd.Variable(torch.FloatTensor(np.random.uniform(-1,1, batch)*np.pi).cuda()) #[0, pi] #[-180, 180]
     sin = torch.sin(theta)
-    axis = torch.autograd.Variable(torch.randn(batch, 3)#.cuda())
+    axis = torch.autograd.Variable(torch.randn(batch, 3).cuda())
     axis = normalize_vector(axis) #batch*3
     qw = torch.cos(theta)
     qx = axis[:,0]*sin
@@ -425,7 +425,7 @@ def compute_euler_angles_from_rotation_matrices(rotation_matrices):
     ys=torch.atan2(-R[:,2,0], sy)
     zs=R[:,1,0]*0
         
-    out_euler=torch.autograd.Variable(torch.zeros(batch,3)#.cuda())
+    out_euler=torch.autograd.Variable(torch.zeros(batch,3).cuda())
     out_euler[:,0]=x*(1-singular)+xs*singular
     out_euler[:,1]=y*(1-singular)+ys*singular
     out_euler[:,2]=z*(1-singular)+zs*singular
@@ -451,7 +451,7 @@ def compute_quaternions_from_rotation_matrices(matrices):
     batch=matrices.shape[0]
     
     w=torch.sqrt(1.0 + matrices[:,0,0] + matrices[:,1,1] + matrices[:,2,2]) / 2.0
-    w = torch.max (w , torch.autograd.Variable(torch.zeros(batch)#.cuda())+1e-8) #batch
+    w = torch.max (w , torch.autograd.Variable(torch.zeros(batch).cuda())+1e-8) #batch
     w4 = 4.0 * w;
     x= (matrices[:,2,1] - matrices[:,1,2]) / w4 ;
     y= (matrices[:,0,2] - matrices[:,2,0]) / w4 ;

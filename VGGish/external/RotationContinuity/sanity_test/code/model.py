@@ -30,7 +30,7 @@ class Model(nn.Module):
             self.out_channel = 3
         
         T_pose_np  = np.array([[1,0,0],[0,1,0], [0,0,1]])
-        self.T_pose = torch.autograd.Variable(torch.FloatTensor(T_pose_np)#.cuda())
+        self.T_pose = torch.autograd.Variable(torch.FloatTensor(T_pose_np).cuda())
         
         self.inner_size =128
         

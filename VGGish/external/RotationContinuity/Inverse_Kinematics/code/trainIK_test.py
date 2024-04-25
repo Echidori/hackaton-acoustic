@@ -38,7 +38,7 @@ def get_augmented_dance_seq_from_quat_bvh(dance_quat_seq):
     dance_quat_seq = dance_quat_seq[Skip_initial_frame_num: dance_quat_seq.shape[0]] #seq_len*(3+joint_num*4)
     
     seq_len=dance_quat_seq.shape[0]
-    dance_quat_seq_cuda = torch.autograd.Variable(torch.FloatTensor(dance_quat_seq)#.cuda()) #seq_len*(3+joint_num*4)
+    dance_quat_seq_cuda = torch.autograd.Variable(torch.FloatTensor(dance_quat_seq).cuda()) #seq_len*(3+joint_num*4)
 
     #augment the rotation
     hip_quat_seq_cuda = dance_quat_seq_cuda[:, 3:7]
@@ -46,7 +46,7 @@ def get_augmented_dance_seq_from_quat_bvh(dance_quat_seq):
     
     ##generate a random rotation matrix
     axisR= [0,1,0,0]#[0,1,0,np.random.randint(0,360)/180.0*np.pi]
-    mat_r=torch.autograd.Variable(torch.FloatTensor(euler.axangle2mat(axisR[0:3], axisR[3]))#.cuda())#3*3
+    mat_r=torch.autograd.Variable(torch.FloatTensor(euler.axangle2mat(axisR[0:3], axisR[3])).cuda())#3*3
     mat_r = mat_r.view(1, 3,3).repeat(hip_matrix_seq_cuda.shape[0],1,1) #seq_len*3*3
     
     new_mat_r = torch.matmul(mat_r,hip_matrix_seq_cuda,) #seq_len*3*3
@@ -74,7 +74,7 @@ def test_all_dances(read_weight_path, out_rotation_mode, dance_lst, out_bvh_fold
     
     print ("Load "+read_weight_path)
     model.load_state_dict(torch.load(read_weight_path))
-    model#.cuda()
+    model.cuda()
     
     model.initialize_skeleton_features("../data/standard.bvh")
     

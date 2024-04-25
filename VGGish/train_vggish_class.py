@@ -68,7 +68,7 @@ if __name__ == "__main__":
     print("Deconv Loaded")
     labels = np.load(args.labels_dir)
     print("Labels Loaded")
-    labels = torch.Tensor(labels)#.cuda()
+    labels = torch.Tensor(labels).cuda()
 
     if args.num_channels < 10:
         if args.treated:
@@ -173,14 +173,14 @@ if __name__ == "__main__":
     valid_waves = valid_waves[..., (offset):(offset+precutoff)]
     test_waves = test_waves[..., (offset):(offset+precutoff)]
 
-    train_waves = torch.Tensor(train_waves)#.cuda()
-    train_labels = torch.Tensor(train_labels)#.cuda()
+    train_waves = torch.Tensor(train_waves).cuda()
+    train_labels = torch.Tensor(train_labels).cuda()
 
-    valid_waves = torch.Tensor(valid_waves)#.cuda()
-    valid_labels = torch.Tensor(valid_labels)#.cuda()
+    valid_waves = torch.Tensor(valid_waves).cuda()
+    valid_labels = torch.Tensor(valid_labels).cuda()
 
-    test_waves = torch.Tensor(test_waves)#.cuda()
-    test_labels = torch.Tensor(test_labels)#.cuda()
+    test_waves = torch.Tensor(test_waves).cuda()
+    test_labels = torch.Tensor(test_labels).cuda()
 
 
     if args.resample:
@@ -312,7 +312,7 @@ if __name__ == "__main__":
         print("loaded")
         deconv = deconv[:800]
         labels = labels[:800]
-        labels = torch.Tensor(labels)#.cuda()
+        labels = torch.Tensor(labels).cuda()
 
         offset = 0
         
@@ -321,13 +321,13 @@ if __name__ == "__main__":
 
         if args.pretrained:
             deconv = deconv[..., (offset):(offset+123800)]
-            deconv = torch.Tensor(deconv)#.cuda()
+            deconv = torch.Tensor(deconv).cuda()
             deconv = resample(deconv)
             deconv = deconv[..., mic_indices, :30950]
             deconv = torch.mean(deconv, dim=1)
         elif args.multi_chan:
             deconv = deconv[:, mic_indices, (offset):(offset+15475)]
-            deconv = torch.Tensor(deconv)#.cuda()
+            deconv = torch.Tensor(deconv).cuda()
 
         if args.music:
             deconv = deconv/32768.0

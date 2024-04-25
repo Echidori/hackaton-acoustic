@@ -60,7 +60,7 @@ def test(pc_fn_lst, weight_fn,  out_rotation_mode, regress_t, rotation_sample_nu
     
     print ("Load "+ weight_fn)
     model.load_state_dict(torch.load( weight_fn))
-    model#.cuda()
+    model.cuda()
     model.eval()
     
     geodesic_errors_lst = np.array([])
@@ -71,7 +71,7 @@ def test(pc_fn_lst, weight_fn,  out_rotation_mode, regress_t, rotation_sample_nu
         batch=rotation_sample_num    
         pc1_np  = np.array(pts_loader.load(pc_fn))
         point_num = int(pc1_np.shape[0]/2)
-        pc1 = torch.autograd.Variable(torch.FloatTensor(pc1_np[0:point_num])#.cuda()) #num*3
+        pc1 = torch.autograd.Variable(torch.FloatTensor(pc1_np[0:point_num]).cuda()) #num*3
         pc1 = pc1.view(1, point_num,3).expand(batch,point_num,3).contiguous() #batch*p_num*3
         gt_rmat = tools.get_sampled_rotation_matrices_by_axisAngle(batch)#batch*3*3
         gt_rmats = gt_rmat.contiguous().view(batch,1,3,3).expand(batch, point_num, 3,3 ).contiguous().view(-1,3,3)
@@ -80,7 +80,7 @@ def test(pc_fn_lst, weight_fn,  out_rotation_mode, regress_t, rotation_sample_nu
         pc2 = pc2.view(batch, point_num, 3) ##batch*p_num*3
         
         if(model.regress_t == True):
-            gt_translation = torch.autograd.Variable(torch.FloatTensor(np.random.randn(batch,3))#.cuda())/10.0
+            gt_translation = torch.autograd.Variable(torch.FloatTensor(np.random.randn(batch,3)).cuda())/10.0
             pc2 = pc2 + gt_translation.view(batch,1,3).expand(batch, point_num, 3)
             ###network forward########
             out_rmat, out_translation, out_pc2 = model(pc1, pc2)#batch*3*3

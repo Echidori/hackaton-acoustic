@@ -151,8 +151,8 @@ def augment_train_data_torch(train_data, T, axisR):
     batch=train_data.shape[0]
     frame_num=train_data.shape[1]
     joint_num=int (train_data.shape[2]/3)
-    mat_r=torch.autograd.Variable(torch.FloatTensor(euler.axangle2mat(axisR[0:3], axisR[3]))#.cuda())
-    t = torch.autograd.Variable(torch.FloatTensor(T)#.cuda())
+    mat_r=torch.autograd.Variable(torch.FloatTensor(euler.axangle2mat(axisR[0:3], axisR[3])).cuda())
+    t = torch.autograd.Variable(torch.FloatTensor(T).cuda())
     seq= train_data.view(batch, frame_num, joint_num,3)
     hip_index=joint_index['hip']
     hip_seq=seq[:,:,hip_index].clone()

@@ -12,7 +12,7 @@ def test(model,  sample_num, input_mode, sample_method="axisAngle"):
     #print ("########TEST##########")
     with torch.no_grad():
         model.eval()
-        model#.cuda()
+        model.cuda()
         gt_rotation_matrix =[]
         if(sample_method == "axisAngle"):   
             gt_rotation_matrix = tools.get_sampled_rotation_matrices_by_axisAngle(sample_num) #batch*3*3

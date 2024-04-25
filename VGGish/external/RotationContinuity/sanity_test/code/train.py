@@ -117,13 +117,13 @@ def train(model, input_mode = "pose", loss_mode="pose", sampling_method = "axis_
     
     #model.double()
     
-    model#.cuda()
+    model.cuda()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.00001)#, betas=(0.5,0.9))
     #optimizer = torch.optim.SGD(model.parameters(), lr=0.00001)
     model.train()
     
     T_pose_np  = np.array([[1,0,0],[0,1,0], [0,0,1]])
-    T_pose = torch.autograd.Variable(torch.FloatTensor(T_pose_np)#.cuda())
+    T_pose = torch.autograd.Variable(torch.FloatTensor(T_pose_np).cuda())
     model.set_T_pose(T_pose)
     for iteration in range(total_iter):
         

@@ -4,8 +4,8 @@ import numpy as np
 import torch
 from external.torchvggish.torchvggish.vggish import VGG, VGGish, make_layers
 from external.torchvggish.torchvggish.vggish_input import waveform_to_examples
-import external.torchvggish.torchvggish.mel_features
-import external.torchvggish.torchvggish.vggish_params
+import external.torchvggish.torchvggish.mel_features as mel_features
+import external.torchvggish.torchvggish.vggish_params as vggish_params
 
 
 
@@ -62,7 +62,7 @@ def get_finetune_model(pretrained=True, frozen=True, out_channels=2, dropout=Fal
         # torch.nn.Linear(in_features=256, out_features=256, bias=True),
         # torch.nn.ReLU(),
         torch.nn.Linear(in_features=256, out_features=out_channels, bias=True)
-    )#.cuda()
+    ).cuda()
     
     return finetune_model
 
@@ -81,7 +81,7 @@ def get_finetune_model(pretrained=True, frozen=True, out_channels=2, dropout=Fal
 #                                     increasefilter_gap=12,
 #                                     use_bn=True,
 #                                     use_do=True,
-#                                     verbose=False)#.cuda()
+#                                     verbose=False).cuda()
             
 #         def forward(self, x):
 #             x = self.resnet.forward(torch.unsqueeze(x, axis=1))
@@ -115,7 +115,7 @@ class CustomVGGish(VGG):
                             torch.nn.ReLU(),
                             torch.nn.Dropout(p_dropout),
                             torch.nn.Linear(in_features=256, out_features=out_channels, bias=True)
-                            )#.cuda()
+                            ).cuda()
 
     def forward(self, x):
         x = self._preprocess(x)
@@ -199,7 +199,7 @@ class CustomVGGish2(VGG):
                             torch.nn.ReLU(),
                             torch.nn.Dropout(p_dropout),
                             torch.nn.Linear(in_features=256, out_features=out_channels, bias=True)
-                            )#.cuda()
+                            ).cuda()
 
     def forward(self, x):
         x = self._preprocess(x)
@@ -217,15 +217,15 @@ class CustomVGGish2(VGG):
             reshape = True
 
         # Compute log mel spectrogram features.
-        x = torchvggish.mel_features.log_mel_spectrogram(
+        x = mel_features.log_mel_spectrogram(
             x,
-            audio_sample_rate=torchvggish.vggish_params.SAMPLE_RATE,
-            log_offset=torchvggish.vggish_params.LOG_OFFSET,
-            window_length_secs=torchvggish.vggish_params.STFT_WINDOW_LENGTH_SECONDS,
-            hop_length_secs=torchvggish.vggish_params.STFT_HOP_LENGTH_SECONDS,
-            num_mel_bins=torchvggish.vggish_params.NUM_MEL_BINS,
-            lower_edge_hertz=torchvggish.vggish_params.MEL_MIN_HZ,
-            upper_edge_hertz=torchvggish.vggish_params.MEL_MAX_HZ)
+            audio_sample_rate=vggish_params.SAMPLE_RATE,
+            log_offset=vggish_params.LOG_OFFSET,
+            window_length_secs=vggish_params.STFT_WINDOW_LENGTH_SECONDS,
+            hop_length_secs=vggish_params.STFT_HOP_LENGTH_SECONDS,
+            num_mel_bins=vggish_params.NUM_MEL_BINS,
+            lower_edge_hertz=vggish_params.MEL_MIN_HZ,
+            upper_edge_hertz=vggish_params.MEL_MAX_HZ)
             
         if reshape:
             #print("orig siez")

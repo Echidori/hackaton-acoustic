@@ -17,7 +17,7 @@ class Model(nn.Module):
         
         self.out_rotation_mode = out_rotation_mode
         
-        self.joint_parent_matrix=torch.autograd.Variable(torch.Tensor(read_bvh.parenting_matrix)#.cuda())
+        self.joint_parent_matrix=torch.autograd.Variable(torch.Tensor(read_bvh.parenting_matrix).cuda())
         
         if(self.out_rotation_mode=="ortho6d"):
             self.out_channel = 6
@@ -62,7 +62,7 @@ class Model(nn.Module):
         self.set_parent_index_lst(parent_index_lst)
         self.set_joint_offsets(joint_offsets)
         
-        #self.joint_rotation_matrix_limitation_mask = torch.autograd.Variable(torch.FloatTensor(fk.get_joint_rotation_matrix_limitaion_mask_np(joint_index_lst))#.cuda()) #joint_num*4*4
+        #self.joint_rotation_matrix_limitation_mask = torch.autograd.Variable(torch.FloatTensor(fk.get_joint_rotation_matrix_limitaion_mask_np(joint_index_lst)).cuda()) #joint_num*4*4
         #self.joint_rotation_matrix_limitation_mask = self.joint_rotation_matrix_limitation_mask.view(1,self.joint_num, 4,4)
     
     
@@ -77,7 +77,7 @@ class Model(nn.Module):
         
         
         ##get the offsets batch
-        offsets_batch = torch.autograd.Variable(torch.FloatTensor(self.joint_offsets)#.cuda())
+        offsets_batch = torch.autograd.Variable(torch.FloatTensor(self.joint_offsets).cuda())
         offsets_batch = offsets_batch.view(1, joint_num,3).repeat(batch, 1,1) #batch*joint_num*3
         
         fk=FK()
@@ -121,7 +121,7 @@ class Model(nn.Module):
         #out_rotation_matrices = out_rotation_matrices * self.joint_rotation_matrix_limitation_mask.expand(batch, self.joint_num,4,4)
         out_poses = self.rotation_seq2_pose_seq(out_rotation_matrices) #b*joint_num*3
         
-        #out_rotation_matrices_fix_hip =torch.cat( (torch.autograd.Variable(torch.eye(4,4)#.cuda()).view(1,1,4,4).expand(batch, 1, 4,4), out_rotation_matrices[:,1:self.joint_num]), 1)
+        #out_rotation_matrices_fix_hip =torch.cat( (torch.autograd.Variable(torch.eye(4,4).cuda()).view(1,1,4,4).expand(batch, 1, 4,4), out_rotation_matrices[:,1:self.joint_num]), 1)
         #out_poses_fix_hip = self.rotation_seq2_pose_seq(out_rotation_matrices_fix_hip)
         
         #out_rotation_matrices_with_hip = torch.cat((out_rotation_matrices[:,0:1], out_rotation_matrices[:,1:self.joint_num].detach()), 1)
@@ -153,7 +153,7 @@ class Model(nn.Module):
         r_matrices = predict_rotation_matrices[:,1:joint_num].contiguous().view(-1,4,4) #(batch*(joint_num-1))*4*4
         eulers =tools.compute_euler_angles_from_rotation_matrices(r_matrices) #(batch*(joint_num-1))*3
         
-        zeros =torch.autograd.Variable(torch.zeros(batch*(joint_num-1))#.cuda())
+        zeros =torch.autograd.Variable(torch.zeros(batch*(joint_num-1)).cuda())
         threshold = zeros + 100/180*np.pi
         
         loss_twist = torch.pow(torch.max(zeros, torch.abs(eulers[:,1])-threshold),2).mean() 

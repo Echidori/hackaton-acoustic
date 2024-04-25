@@ -20,7 +20,7 @@ def train_one_iteraton( pc_fn_lst,  param, model, optimizer, iteration):
     pc_id = np.random.randint(0, len(pc_fn_lst))
     pc1_np  = np.array(pts_loader.load(pc_fn_lst[pc_id]))
     point_num = int(pc1_np.shape[0]/2)
-    pc1 = torch.autograd.Variable(torch.FloatTensor(pc1_np[0:point_num])#.cuda()) #num*3
+    pc1 = torch.autograd.Variable(torch.FloatTensor(pc1_np[0:point_num]).cuda()) #num*3
     
     pc1 = pc1.view(1, point_num,3).expand(batch,point_num,3).contiguous() #batch*p_num*3
     gt_rmat = tools.get_sampled_rotation_matrices_by_axisAngle(batch)#batch*3*3
@@ -30,7 +30,7 @@ def train_one_iteraton( pc_fn_lst,  param, model, optimizer, iteration):
     pc2 = pc2.view(batch, point_num, 3) ##batch*p_num*3
     
     if(model.regress_t==True):
-        gt_translation = torch.autograd.Variable(torch.FloatTensor(np.random.randn(batch,3))#.cuda())/10.0
+        gt_translation = torch.autograd.Variable(torch.FloatTensor(np.random.randn(batch,3)).cuda())/10.0
         pc2 = pc2 + gt_translation.view(batch,1,3).expand(batch, point_num, 3)
     
     ###network forward########
@@ -96,7 +96,7 @@ def train(pc_lst, param):
     if(param.read_weight_path!=""):
         print ("Load "+param.read_weight_path)
         model.load_state_dict(torch.load(param.read_weight_path))
-    model#.cuda()
+    model.cuda()
     optimizer = torch.optim.Adam(model.parameters(), lr=param.lr)#, betas=(0.5,0.9))
     model.train()
     

@@ -140,8 +140,8 @@ if __name__ == "__main__":
         return output
     
 
-    train_std_cuda = torch.Tensor(train_std)#.cuda()
-    train_mean_cuda = torch.Tensor(train_mean)#.cuda()
+    train_std_cuda = torch.Tensor(train_std).cuda()
+    train_mean_cuda = torch.Tensor(train_mean).cuda()
 
     def unnormalize(xy):
         return xy*(train_std_cuda + 1e-8) + train_mean_cuda
@@ -180,14 +180,14 @@ if __name__ == "__main__":
     valid_waves = valid_waves[..., (offset):(offset+precutoff)]
     test_waves = test_waves[..., (offset):(offset+precutoff)]
 
-    train_waves = torch.Tensor(train_waves)#.cuda()
-    train_xy = torch.Tensor(train_xy)#.cuda()
+    train_waves = torch.Tensor(train_waves).cuda()
+    train_xy = torch.Tensor(train_xy).cuda()
 
-    valid_waves = torch.Tensor(valid_waves)#.cuda()
-    valid_xy = torch.Tensor(valid_xy)#.cuda()
+    valid_waves = torch.Tensor(valid_waves).cuda()
+    valid_xy = torch.Tensor(valid_xy).cuda()
 
-    test_waves = torch.Tensor(test_waves)#.cuda()
-    test_xy = torch.Tensor(test_xy)#.cuda()
+    test_waves = torch.Tensor(test_waves).cuda()
+    test_xy = torch.Tensor(test_xy).cuda()
 
 
     if args.resample:
@@ -349,7 +349,7 @@ if __name__ == "__main__":
         print("loaded")
         deconv = deconv[:800]
         centroid = centroid[:800]
-        centroid = torch.Tensor(centroid)#.cuda()
+        centroid = torch.Tensor(centroid).cuda()
 
         offset = 0
         
@@ -358,13 +358,13 @@ if __name__ == "__main__":
 
         if args.pretrained:
             deconv = deconv[..., (offset):(offset+123800)]
-            deconv = torch.Tensor(deconv)#.cuda()
+            deconv = torch.Tensor(deconv).cuda()
             deconv = resample(deconv)
             deconv = deconv[..., mic_indices, :30950]
             deconv = torch.mean(deconv, dim=1)
         elif args.multi_chan:
             deconv = deconv[:, mic_indices, (offset):(offset+15475)]
-            deconv = torch.Tensor(deconv)#.cuda()
+            deconv = torch.Tensor(deconv).cuda()
 
         if args.music:
             deconv = deconv/32768.0

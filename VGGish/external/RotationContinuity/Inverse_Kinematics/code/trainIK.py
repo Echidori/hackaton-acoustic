@@ -54,7 +54,7 @@ def get_augmented_gt_seq_for_training(dances_lst, target_framerate, min_seq_len=
     
 
     seq_len=dance_quat_seq.shape[0]
-    dance_quat_seq_cuda = torch.autograd.Variable(torch.FloatTensor(dance_quat_seq)#.cuda()) #seq_len*(3+joint_num*4)
+    dance_quat_seq_cuda = torch.autograd.Variable(torch.FloatTensor(dance_quat_seq).cuda()) #seq_len*(3+joint_num*4)
 
     #augment the rotation
     hip_quat_seq_cuda = dance_quat_seq_cuda[:, 3:7]
@@ -62,7 +62,7 @@ def get_augmented_gt_seq_for_training(dances_lst, target_framerate, min_seq_len=
     
     ##generate a random rotation matrix
     axisR= [0,1,0,np.random.randint(0,360)/180*np.pi]
-    mat_r=torch.autograd.Variable(torch.FloatTensor(euler.axangle2mat(axisR[0:3], axisR[3]))#.cuda())#3*3
+    mat_r=torch.autograd.Variable(torch.FloatTensor(euler.axangle2mat(axisR[0:3], axisR[3])).cuda())#3*3
     mat_r = mat_r.view(1, 3,3).repeat(hip_matrix_seq_cuda.shape[0],1,1) #seq_len*3*3
     
     new_mat_r = torch.matmul(mat_r,hip_matrix_seq_cuda,) #seq_len*3*3
@@ -107,7 +107,7 @@ def train_one_iteraton(logger, dances_lst,  param, model, optimizer, iteration, 
     gt_rotation_matrices = tools.get_44_rotation_matrix_from_33_rotation_matrix(gt_rotation_matrices).view(seq_len,-1,4,4)#seq_len*joint_num*4*4
     gt_poses = model.rotation_seq2_pose_seq(gt_rotation_matrices) #seq_len*joint_num*3
     
-    #gt_rotation_matrices_fix_hip =torch.cat( (torch.autograd.Variable(torch.eye(4,4)#.cuda()).view(1,1,4,4).expand(seq_len, 1, 4,4), gt_rotation_matrices[:,1:Joint_num]), 1)
+    #gt_rotation_matrices_fix_hip =torch.cat( (torch.autograd.Variable(torch.eye(4,4).cuda()).view(1,1,4,4).expand(seq_len, 1, 4,4), gt_rotation_matrices[:,1:Joint_num]), 1)
     #gt_poses_fix_hip = model.rotation_seq2_pose_seq(gt_rotation_matrices_fix_hip)
  
     ###network forward########
@@ -211,7 +211,7 @@ def train(dances_lst, param):
     if(param.read_weight_path!=""):
         print ("Load "+param.read_weight_path)
         model.load_state_dict(torch.load(param.read_weight_path))
-    model#.cuda()
+    model.cuda()
     optimizer = torch.optim.Adam(model.parameters(), lr=param.lr)#, betas=(0.5,0.9))
     model.train()
     
